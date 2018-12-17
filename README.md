@@ -18,10 +18,10 @@ For now, the API and the tests use the same fake data put in place for the alpha
 The two parking facilities ("pf001", "pf002") have similar pricing setups. 
 
 A TimeslotPrice object represents the price per hour of parking in a specific time interval during the day.
-```json
+```javascript
 {
-	StartHour: 3,					// starting from 03:00 AM 
-	EndHour: 13,						// until 01:00 PM
+	StartHour: 3,		// starting from 03:00 AM 
+	EndHour: 13,		// until 01:00 PM
 	PricePerHour: 1.5	// the price is 1.5 EUR/hour
 }
 ```
@@ -30,23 +30,23 @@ Both customers that have a contract with a specific parking facility and those w
 
 The ServiceProfile object describes the price breakdown per week days vs weekend days and per customers with a contract vs customers without a contract.
 
-```json
+```javascript
 {
-	WeekDaysPrices: [],							// list of TimeslotPrices applied for customers with active contracts during week days
-	WeekendPrices: [],								// list of TimeslotPrices applied for customers with active contracts during weekend days	
-	OverrunWeekDaysPrices: [],// list of TimeslotPrices applied for customers without active contracts during week days	
+	WeekDaysPrices: [],		// list of TimeslotPrices applied for customers with active contracts during week days
+	WeekendPrices: [],		// list of TimeslotPrices applied for customers with active contracts during weekend days	
+	OverrunWeekDaysPrices: [],	// list of TimeslotPrices applied for customers without active contracts during week days	
 	OverrunWeekendPrices: [],	// list of TimeslotPrices applied for customers without active contracts during week days
 }
 ```
 ### Sessions
 A Session object represents a parking session of a specific customer in a specific parking facility. Based on all his/her sessions, the invoice amount will be calculated for each customer.
 
-```json
+```javascript
 {
-    "ParkingFacilityId": <ParkingFacilityId>,
-    "CustomerId": <CustomerId>,
-    "StartDateTime": <StartDateTime>,
-    "EndDateTime": <EndDateTime>
+    ParkingFacilityId: <ParkingFacilityId>,
+    CustomerId: <CustomerId>,
+    StartDateTime: <StartDateTime>,
+    EndDateTime: <EndDateTime>
 }
 ```
 
