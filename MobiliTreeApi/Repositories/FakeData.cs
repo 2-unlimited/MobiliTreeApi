@@ -5,7 +5,7 @@ namespace MobiliTreeApi.Repositories
 {
     public static class FakeData
     {
-        public static List<Session> GetSeedSessios() => new List<Session>();
+        public static List<Session> GetSeedSessions() => new List<Session>();
 
         public static Dictionary<string, Customer> GetSeedCustomers() =>
             new Dictionary<string, Customer>

@@ -14,7 +14,7 @@ namespace MobiliTreeApi.Tests
 
         public InvoiceServiceTest()
         {
-            _sessionsRepository = new SessionsRepositoryFake(FakeData.GetSeedSessios());
+            _sessionsRepository = new SessionsRepositoryFake(FakeData.GetSeedSessions());
             _parkingFacilityRepository = new ParkingFacilityRepositoryFake(FakeData.GetSeedServiceProfiles());
             _customerRepository = new CustomerRepositoryFake(FakeData.GetSeedCustomers());
         }

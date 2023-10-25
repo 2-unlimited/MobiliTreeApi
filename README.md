@@ -3,7 +3,7 @@
 MobiliTree is a new startup in the parking industry that wants to provide a consistent framework of organizing a parking business. 
 Their goal is helping parking managers and landlords to monitor their cash flow and manage their parking sessions.
 
-You are part of their development team and your current goal is to produce an API which will be capable of interracting with both the hardware in the parking facilities and the customers.
+You are part of their development team and your current goal is to produce an API which will be capable of interacting with both the hardware in the parking facilities and the customers.
 
 ## Data
 For now, the API and the tests use the same fake data put in place for the alpha testing team (4 customers and two parking facilities).
@@ -71,12 +71,12 @@ GET
 
 ## Requirements
 
- - .NET Core 2.1
+ - .NET6
 
 ## Compatible IDEs
 
 Tested on:
-- Visual Studio Professional 2017 on Windows (15.8.8)
+- Visual Studio Professional 2022 on Windows (17.5.0)
 
 ## Build
 
@@ -87,11 +87,11 @@ $ dotnet build
 ## Test
 
 ```console
-$ dotnet test MobiliTree.Tests
+$ dotnet test MobiliTreeApi.Tests
 ```
 
 ## Run
 
 ```console
-$ dotnet run --project MobiliTree
+$ dotnet run --project MobiliTreeApi
 ```
