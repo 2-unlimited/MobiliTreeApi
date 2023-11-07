@@ -60,21 +60,21 @@ namespace MobiliTreeApi.Tests
             var startDateTime = new DateTime(2018, 12, 15, 12, 25, 0);
             _sessionsRepository.AddSession(new Domain.Session
             {
-                CustomerId = "cust1",
+                CustomerId = "c001",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
             _sessionsRepository.AddSession(new Domain.Session
             {
-                CustomerId = "cust1",
+                CustomerId = "c001",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
             _sessionsRepository.AddSession(new Domain.Session
             {
-                CustomerId = "cust2",
+                CustomerId = "c002",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
@@ -83,14 +83,14 @@ namespace MobiliTreeApi.Tests
             var result = GetSut().GetInvoices("pf001");
 
             Assert.Equal(2, result.Count);
-            var invoiceCust1 = result.SingleOrDefault(x => x.CustomerId == "cust1");
-            var invoiceCust2 = result.SingleOrDefault(x => x.CustomerId == "cust2");
+            var invoiceCust1 = result.SingleOrDefault(x => x.CustomerId == "c001");
+            var invoiceCust2 = result.SingleOrDefault(x => x.CustomerId == "c002");
             Assert.NotNull(invoiceCust1);
             Assert.NotNull(invoiceCust2);
             Assert.Equal("pf001", invoiceCust1.ParkingFacilityId);
             Assert.Equal("pf001", invoiceCust2.ParkingFacilityId);
-            Assert.Equal("cust1", invoiceCust1.CustomerId);
-            Assert.Equal("cust2", invoiceCust2.CustomerId);
+            Assert.Equal("c001", invoiceCust1.CustomerId);
+            Assert.Equal("c002", invoiceCust2.CustomerId);
         }
 
         [Fact]
@@ -99,21 +99,21 @@ namespace MobiliTreeApi.Tests
             var startDateTime = new DateTime(2018, 12, 15, 12, 25, 0);
             _sessionsRepository.AddSession(new Domain.Session
             {
-                CustomerId = "cust1",
+                CustomerId = "c001",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
             _sessionsRepository.AddSession(new Domain.Session
             {
-                CustomerId = "cust1",
+                CustomerId = "c001",
                 ParkingFacilityId = "pf002",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
             _sessionsRepository.AddSession(new Domain.Session
             {
-                CustomerId = "cust2",
+                CustomerId = "c002",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
@@ -122,14 +122,14 @@ namespace MobiliTreeApi.Tests
             var result = GetSut().GetInvoices("pf001");
 
             Assert.Equal(2, result.Count);
-            var invoiceCust1 = result.SingleOrDefault(x => x.CustomerId == "cust1");
-            var invoiceCust2 = result.SingleOrDefault(x => x.CustomerId == "cust2");
+            var invoiceCust1 = result.SingleOrDefault(x => x.CustomerId == "c001");
+            var invoiceCust2 = result.SingleOrDefault(x => x.CustomerId == "c002");
             Assert.NotNull(invoiceCust1);
             Assert.NotNull(invoiceCust2);
             Assert.Equal("pf001", invoiceCust1.ParkingFacilityId);
             Assert.Equal("pf001", invoiceCust2.ParkingFacilityId);
-            Assert.Equal("cust1", invoiceCust1.CustomerId);
-            Assert.Equal("cust2", invoiceCust2.CustomerId);
+            Assert.Equal("c001", invoiceCust1.CustomerId);
+            Assert.Equal("c002", invoiceCust2.CustomerId);
         }
 
         private IInvoiceService GetSut()
