@@ -71,7 +71,7 @@ GET
 
 ## Requirements
 
- - .NET6
+ - .NET9
 
 ## Compatible IDEs
 
