@@ -1,26 +1,31 @@
 using System;
 using System.Linq;
-using MobiliTreeApi.Repositories;
-using MobiliTreeApi.Services;
+using MobiliTreeApi.Events.Models;
+using MobiliTreeApi.GetInvoices.Domain;
+using MobiliTreeApi.GetInvoices.Storage;
+using MobiliTreeApi.Shared.Projection;
 using Xunit;
+using MobiliTreeApi.Shared.Storage;
 
 namespace MobiliTreeApi.Tests
 {
     public class InvoiceServiceTest
     {
-        private readonly ISessionsRepository _sessionsRepository;
+        private readonly SessionProjection _sessionProjection;
         private readonly IParkingFacilityRepository _parkingFacilityRepository;
-        private readonly ICustomerRepository _customerRepository;
+        private readonly ISessionStorage _storage;
 
         public InvoiceServiceTest()
         {
-            _sessionsRepository = new SessionsRepositoryFake(FakeData.GetSeedSessions());
-            _parkingFacilityRepository = new ParkingFacilityRepositoryFake(FakeData.GetSeedServiceProfiles());
-            _customerRepository = new CustomerRepositoryFake(FakeData.GetSeedCustomers());
+            var fakeStorage = new FakeBaseSessionStorage();
+            _storage = new SessionStorage(fakeStorage);
+
+            _sessionProjection = new SessionProjection(_storage);
+            _parkingFacilityRepository = new ParkingFacilityRepository(FakeData.GetSeedServiceProfiles());
         }
 
         [Fact]
-        public void GivenSessionsService_WhenQueriedForInexistentParkingFacility_ThenThrowException()
+        public void GivenSessionsService_WhenQueriedForNonExistentParkingFacility_ThenThrowException()
         {
             var ex = Assert.Throws<ArgumentException>(() => GetSut().GetInvoices("nonExistingParkingFacilityId"));
             Assert.Equal("Invalid parking facility id 'nonExistingParkingFacilityId'", ex.Message);
@@ -38,7 +43,7 @@ namespace MobiliTreeApi.Tests
         public void GivenOneSessionInTheStore_WhenQueriedForExistingParkingFacility_ThenReturnInvoiceListWithOneElement()
         {
             var startDateTime = new DateTime(2018, 12, 15, 12, 25, 0);
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "some customer",
                 ParkingFacilityId = "pf001",
@@ -47,7 +52,7 @@ namespace MobiliTreeApi.Tests
             });
 
             var result = GetSut().GetInvoices("pf001");
-            
+
             var invoice = Assert.Single(result);
             Assert.NotNull(invoice);
             Assert.Equal("pf001", invoice.ParkingFacilityId);
@@ -58,21 +63,21 @@ namespace MobiliTreeApi.Tests
         public void GivenMultipleSessionsInTheStore_WhenQueriedForExistingParkingFacility_ThenReturnOneInvoicePerCustomer()
         {
             var startDateTime = new DateTime(2018, 12, 15, 12, 25, 0);
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "c001",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "c001",
                 ParkingFacilityId = "pf001",
-                StartDateTime = startDateTime,
-                EndDateTime = startDateTime.AddHours(1)
+                StartDateTime = startDateTime.AddMinutes(1),
+                EndDateTime = startDateTime.AddHours(1).AddMinutes(1)
             });
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "c002",
                 ParkingFacilityId = "pf001",
@@ -97,21 +102,21 @@ namespace MobiliTreeApi.Tests
         public void GivenMultipleSessionsForMultipleFacilitiesInTheStore_WhenQueriedForExistingParkingFacility_ThenReturnInvoicesOnlyForQueriedFacility()
         {
             var startDateTime = new DateTime(2018, 12, 15, 12, 25, 0);
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "c001",
                 ParkingFacilityId = "pf001",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "c001",
                 ParkingFacilityId = "pf002",
                 StartDateTime = startDateTime,
                 EndDateTime = startDateTime.AddHours(1)
             });
-            _sessionsRepository.AddSession(new Domain.Session
+            _storage.UpsertSession(new Session
             {
                 CustomerId = "c002",
                 ParkingFacilityId = "pf001",
@@ -132,12 +137,11 @@ namespace MobiliTreeApi.Tests
             Assert.Equal("c002", invoiceCust2.CustomerId);
         }
 
-        private IInvoiceService GetSut()
+        private InvoiceManagement GetSut()
         {
-            return new InvoiceService(
-                _sessionsRepository, 
-                _parkingFacilityRepository,
-                _customerRepository);
+            return new InvoiceManagement(
+                _sessionProjection,
+                _parkingFacilityRepository);
         }
     }
 }

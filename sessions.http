@@ -1,0 +1,19 @@
+@baseUrl = http://localhost:5400
+
+### Create Session
+POST {{baseUrl}}/sessions
+Content-Type: application/json
+
+{
+  "parkingFacilityId": "pf001",
+  "customerId": "c001",
+  "startDateTime": "2025-11-06T09:00:00",
+  "endDateTime": "2025-11-06T17:00:00"
+}
+
+###
+
+### Get Sessions
+GET {{baseUrl}}/sessions/pf001
+
+###

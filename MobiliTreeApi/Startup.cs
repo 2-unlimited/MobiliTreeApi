@@ -1,11 +1,20 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MobiliTreeApi.Repositories;
-using MobiliTreeApi.Services;
+using System.Collections.Generic;
+using MobiliTreeApi.Shared.Domain;
+using MobiliTreeApi.CreateSession;
+using MobiliTreeApi.CreateSession.Domain;
+using MobiliTreeApi.Events;
+using MobiliTreeApi.GetSessions;
+using MobiliTreeApi.GetInvoices;
+using MobiliTreeApi.GetInvoices.Domain;
+using MobiliTreeApi.Shared.ServiceBus;
+using MobiliTreeApi.Shared.Projection;
+using MobiliTreeApi.Shared.Storage;
 
 namespace MobiliTreeApi
 {
@@ -18,21 +27,25 @@ namespace MobiliTreeApi
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            services.AddTransient<ISessionsRepository, SessionsRepositoryFake>();
-            services.AddTransient<ICustomerRepository, CustomerRepositoryFake>();
-            services.AddTransient<IParkingFacilityRepository, ParkingFacilityRepositoryFake>();
-            services.AddTransient<IInvoiceService, InvoiceService>();
-            services.AddSingleton(FakeData.GetSeedCustomers());
-            services.AddSingleton(FakeData.GetSeedServiceProfiles());
-            services.AddSingleton(FakeData.GetSeedSessions());
+            // Fake Infrastructure (Can be ignored)
+            services.AddSingleton<IFakeMessageBus, FakeMessageBus>();
+            services.AddHostedService<FakeMessageBusProcessor>();
+            services.AddSingleton<IFakeBaseSessionStorage, FakeBaseSessionStorage>();
+            services.AddSingleton<GetInvoices.Storage.IParkingFacilityRepository>(_ =>
+                new GetInvoices.Storage.ParkingFacilityRepository(FakeData.GetSeedServiceProfiles()));
+            services.AddSingleton(_ => FakeData.GetSeedCustomers());
 
+            // 'Real' Shared Infrastructure Services
+            services.AddSingleton<ISessionStorage, SessionStorage>();
+            services.AddTransient<ISessionManagement, SessionManagement>();
+            services.AddTransient<ISessionProjection, SessionProjection>();
+            services.AddTransient<ISessionAggregateRepository, FakeSessionAggregateRepository>();
+            services.AddTransient<IHandleMessages<SessionCreated>, SessionCreatedHandler>();
+            services.AddTransient<IInvoiceManagement, InvoiceManagement>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -44,7 +57,9 @@ namespace MobiliTreeApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapCreateSessionApi();
+                endpoints.MapGetSessionsApi();
+                endpoints.MapGetInvoicesApi();
             });
         }
     }
